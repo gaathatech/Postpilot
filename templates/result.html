@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Post Results</title>
+  </head>
+  <body>
+    <h1>Post Results</h1>
+    <ul>
+    {% for r in results %}
+      <li>
+        Page: {{ r.page_id }} — Status: {{ r.status }}
+        {% if r.response %}
+          — ID: {{ r.response.get('id') }}
+        {% elif r.response_text %}
+          — Error: {{ r.response_text }}
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
+    <p><a href="/">Back</a></p>
+  </body>
+  </html>

@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Postpilot - Facebook Poster</title>
+  </head>
+  <body>
+    <h1>Postpilot - Facebook Poster (Flask)</h1>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul style="color: red;">
+        {% for m in messages %}
+          <li>{{ m }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% if not pages %}
+      <form method="post" action="/">
+        <label>Facebook user access token (required):</label><br>
+        <textarea name="user_token" rows="3" cols="80">{{ user_token or '' }}</textarea><br>
+        <small>Token must have permission to manage the Pages (pages_read_engagement/pages_manage_posts or equivalent).</small><br>
+        <button type="submit">List Pages</button>
+      </form>
+    {% else %}
+      <form method="post" action="/post">
+        <input type="hidden" name="user_token" value="{{ user_token }}">
+        <h2>Select Pages</h2>
+        {% for pid, info in pages.items() %}
+          <div>
+            <label>
+              <input type="checkbox" name="pages" value="{{ pid }}"> {{ info.name }} ({{ pid }})
+            </label>
+          </div>
+        {% endfor %}
+
+        <h3>Message</h3>
+        <textarea name="message" rows="5" cols="80"></textarea><br>
+
+        <label>Repeats:</label>
+        <input type="number" name="repeats" value="1" min="1"><br>
+        <label>Interval between rounds (seconds):</label>
+        <input type="number" name="interval" value="60" min="1"><br>
+
+        <button type="submit">Start Posting</button>
+      </form>
+    {% endif %}
+
+    <hr>
+    <p>Note: Do not commit your tokens. You can set `FB_USER_TOKEN` env var to prefill the token on load.</p>
+  </body>
+</html>

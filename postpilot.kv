@@ -1,0 +1,43 @@
+<AddPostPopup>:
+    title: "➕ Add New Post"
+    size_hint: 0.8, 0.7
+    auto_dismiss: False
+    BoxLayout:
+        orientation: "vertical"
+        padding: 10
+        spacing: 10
+
+        Label:
+            text: "Description:"
+        TextInput:
+            id: desc_input
+            multiline: True
+            size_hint_y: None
+            height: 100
+
+        Label:
+            text: "Delay (seconds):"
+        TextInput:
+            id: delay_input
+            text: "10"
+            multiline: False
+            input_filter: "int"
+            size_hint_y: None
+            height: 30
+
+        Label:
+            text: "Select Image:"
+        FileChooserIconView:
+            on_selection: root.select_image(self.selection)
+            size_hint_y: 1
+
+        BoxLayout:
+            size_hint_y: None
+            height: 40
+            spacing: 10
+            Button:
+                text: "Cancel"
+                on_release: root.dismiss()
+            Button:
+                text: "Add Post"
+                on_release: root.save_post()

@@ -1,0 +1,203 @@
+<MainUI>:
+    orientation: 'vertical'
+
+    Label:
+        text: "Facebook Auto Poster"
+        size_hint_y: 0.1
+        font_size: '24sp'
+        bold: True
+
+    TabbedPanel:
+        do_default_tab: False
+        tab_height: '40dp'
+
+        TabbedPanelItem:
+            text: "Tour Posts"
+            BoxLayout:
+                orientation: 'vertical'
+
+                ScrollView:
+                    GridLayout:
+                        id: tour_posts_list
+                        cols: 1
+                        size_hint_y: None
+                        height: self.minimum_height
+                        row_default_height: '80dp'
+                        row_force_default: True
+
+                        # Dynamically create post items
+                        RecycleView:
+                            data: root.tour_posts
+                            viewclass: 'PostItem'
+
+                Button:
+                    text: "Add New Post"
+                    size_hint_y: None
+                    height: '40dp'
+                    on_release: root.open_add_post_popup('tour')
+
+                BoxLayout:
+                    size_hint_y: None
+                    height: '50dp'
+                    spacing: 10
+                    Button:
+                        text: "Start Tour"
+                        on_release: root.start_tour()
+                    Button:
+                        text: "Stop Tour"
+                        on_release: root.stop_tour()
+
+        TabbedPanelItem:
+            text: "NZ Posts"
+            BoxLayout:
+                orientation: 'vertical'
+
+                ScrollView:
+                    GridLayout:
+                        id: nz_posts_list
+                        cols: 1
+                        size_hint_y: None
+                        height: self.minimum_height
+                        row_default_height: '80dp'
+                        row_force_default: True
+
+                        RecycleView:
+                            data: root.nz_posts
+                            viewclass: 'PostItem'
+
+                Button:
+                    text: "Add New Post"
+                    size_hint_y: None
+                    height: '40dp'
+                    on_release: root.open_add_post_popup('nz')
+
+                BoxLayout:
+                    size_hint_y: None
+                    height: '50dp'
+                    spacing: 10
+                    Button:
+                        text: "Start NZ"
+                        on_release: root.start_tour()  # Change to correct method later
+                    Button:
+                        text: "Stop NZ"
+                        on_release: root.stop_tour()  # Change to correct method later
+
+        TabbedPanelItem:
+            text: "Insta Posts"
+            BoxLayout:
+                orientation: 'vertical'
+
+                ScrollView:
+                    GridLayout:
+                        id: insta_posts_list
+                        cols: 1
+                        size_hint_y: None
+                        height: self.minimum_height
+                        row_default_height: '80dp'
+                        row_force_default: True
+
+                        RecycleView:
+                            data: root.insta_posts
+                            viewclass: 'PostItem'
+
+                Button:
+                    text: "Add New Post"
+                    size_hint_y: None
+                    height: '40dp'
+                    on_release: root.open_add_post_popup('insta')
+
+                BoxLayout:
+                    size_hint_y: None
+                    height: '50dp'
+                    spacing: 10
+                    Button:
+                        text: "Start Insta"
+                        on_release: root.start_tour()  # Change to correct method later
+                    Button:
+                        text: "Stop Insta"
+                        on_release: root.stop_tour()  # Change to correct method later
+
+    BoxLayout:
+        size_hint_y: None
+        height: '50dp'
+        spacing: 10
+        padding: 10
+        Button:
+            text: "Run All"
+            on_release: root.run_all_scripts()
+        Button:
+            text: "Stop All"
+            on_release: root.stop_all_scripts()
+
+<PostItem@BoxLayout>:
+    size_hint_y: None
+    height: '70dp'
+    spacing: 10
+    padding: 10
+
+    canvas.before:
+        Color:
+            rgba: (0.9,0.9,0.9,1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Image:
+        source: root.image if root.image else 'placeholder.png'
+        size_hint_x: 0.2
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        Label:
+            text: root.description
+            text_size: self.width, None
+            size_hint_y: None
+            height: self.texture_size[1]
+
+        Label:
+            text: "Delay: " + root.delay + " sec"
+            font_size: '12sp'
+            color: (0.5, 0.5, 0.5, 1)
+
+<AddPostPopup>:
+    title: "Add New Post"
+    size_hint: 0.9, 0.9
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        padding: 10
+
+        FileChooserIconView:
+            id: filechooser
+            on_selection: root.select_image(self.selection)
+
+        TextInput:
+            id: desc_input
+            hint_text: "Enter post description"
+            multiline: True
+            on_text: root.description = self.text
+
+        TextInput:
+            id: delay_input
+            hint_text: "Delay in seconds"
+            input_filter: 'int'
+            text: root.delay
+            on_text: root.delay = self.text
+
+        BoxLayout:
+            size_hint_y: None
+            height: '40dp'
+            spacing: 10
+
+            Button:
+                text: "Save"
+                on_release:
+                    root.description = desc_input.text
+                    root.delay = delay_input.text
+                    root.save_post()
+
+            Button:
+                text: "Cancel"
+                on_release: root.dismiss()
