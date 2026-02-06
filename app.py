@@ -92,14 +92,23 @@ def dashboard():
     env_token = os.environ.get("FB_USER_TOKEN", "")
     return render_template("dashboard.html", user_token=env_token, posted=posting_status)
 
-@app.route("/pages", methods=["POST"])
+@app.route("/pages", methods=["GET", "POST"])
 def list_pages():
-    """List pages for provided token"""
-    user_token = request.form.get("user_token", "").strip()
+    """List pages for provided token.
+
+    GET: try to use `FB_USER_TOKEN` environment variable and show pages.
+    POST: accept `user_token` from a form (existing behavior).
+    """
+    if request.method == "POST":
+        user_token = request.form.get("user_token", "").strip()
+    else:
+        # GET - prefer an environment-provided token so the nav link works
+        user_token = os.environ.get("FB_USER_TOKEN", "").strip()
+
     if not user_token:
         flash("❌ Please provide a Facebook user access token")
         return redirect(url_for("dashboard"))
-    
+
     try:
         pages = get_user_pages(user_token)
         if not pages:
@@ -274,6 +283,44 @@ def nexora_management_control():
     
     status = posting_status.get("nexora_management", {"status": "idle"})
     return render_template("nexora_management.html", status=status)
+
+
+@app.route("/nexora/management/post_now", methods=["POST"])
+def nexora_management_post_now():
+    """Trigger a single immediate post from the management module."""
+    try:
+        success = nexora_management.post_once()
+        if success:
+            flash("✅ Management post sent")
+        else:
+            flash("❌ Failed to send management post (check images/posts files)")
+    except Exception as e:
+        flash(f"❌ Error posting: {e}")
+    return redirect(url_for("nexora_management_control"))
+
+
+@app.route("/nexora/management/manual", methods=["GET"])
+def nexora_management_manual():
+    """Show manual UI for management posts where user can preview and send specific posts."""
+    try:
+        posts = nexora_management.load_posts()
+    except Exception:
+        posts = []
+    return render_template("management_manual.html", posts=posts)
+
+
+@app.route("/nexora/management/post/<int:idx>", methods=["POST"])
+def nexora_management_post_index(idx):
+    """Trigger posting of a specific management post by index."""
+    try:
+        success = nexora_management.post_specific(idx)
+        if success:
+            flash("✅ Management post sent")
+        else:
+            flash("❌ Failed to send management post (check images/posts files)")
+    except Exception as e:
+        flash(f"❌ Error posting: {e}")
+    return redirect(url_for("nexora_management_manual"))
 
 @app.route("/api/status")
 def api_status():

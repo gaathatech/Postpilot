@@ -25,6 +25,12 @@
             </button>
         {% endif %}
     </form>
+
+    <form method="post" action="/nexora/management/post_now" style="margin: 10px 0;">
+        <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.0em; padding: 12px;">
+            📨 Post Now (single announcement)
+        </button>
+    </form>
 </div>
 
 <div class="card">
@@ -56,4 +62,5 @@
 {% endif %}
 
 <a href="/" class="btn btn-primary">← Back to Dashboard</a>
+    <a href="/nexora/management/manual" class="btn btn-primary" style="margin-left:10px;">🛠️ Manual Post Control</a>
 {% endblock %}

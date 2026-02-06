@@ -53,3 +53,26 @@ def run():
 def stop():
     """Stop Nexora Management posting cycle"""
     stop_event.set()
+
+
+def post_once():
+    """Post a single management announcement immediately (returns True on success)."""
+    posts = load_posts()
+    if not posts:
+        print(f"[{MODULE_NAME}] No posts available to post once")
+        return False
+    post = random.choice(posts)
+    return post_on_facebook(post.get("message", ""), post.get("image_filename", ""))
+
+
+def post_specific(index):
+    """Post a specific management post by index (0-based). Returns True on success."""
+    posts = load_posts()
+    if not posts:
+        print(f"[{MODULE_NAME}] No posts available to post")
+        return False
+    if index < 0 or index >= len(posts):
+        print(f"[{MODULE_NAME}] Invalid post index: {index}")
+        return False
+    post = posts[index]
+    return post_on_facebook(post.get("message", ""), post.get("image_filename", ""))
