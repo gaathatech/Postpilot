@@ -15,6 +15,7 @@ app.secret_key = os.environ.get("FLASK_SECRET", "nexora-secure-key-2024")
 # Import Nexora modules
 import visa as nexora_suite
 import tour as nexora_investments
+import management as nexora_management
 
 # Global state for background posting tasks
 posting_threads = {}
@@ -246,6 +247,33 @@ def nexora_investments_control():
     
     status = posting_status.get("nexora_investments", {"status": "idle"})
     return render_template("nexora_investments.html", status=status)
+
+
+@app.route("/nexora/management", methods=["GET", "POST"])
+def nexora_management_control():
+    """Control Nexora Management (Announcements & Admin)"""
+    if request.method == "POST":
+        action = request.form.get("action")
+        if action == "start":
+            thread = threading.Thread(target=nexora_management.run, daemon=True)
+            thread.start()
+            posting_threads["nexora_management"] = thread
+            posting_status["nexora_management"] = {
+                "status": "running",
+                "started_at": datetime.now().isoformat()
+            }
+            flash("✅ Nexora Management posting started")
+        elif action == "stop":
+            nexora_management.stop()
+            posting_status["nexora_management"] = {
+                "status": "stopped",
+                "stopped_at": datetime.now().isoformat()
+            }
+            flash("⏸️ Nexora Management posting stopped")
+        return redirect(url_for("nexora_management_control"))
+    
+    status = posting_status.get("nexora_management", {"status": "idle"})
+    return render_template("nexora_management.html", status=status)
 
 @app.route("/api/status")
 def api_status():
