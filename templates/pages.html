@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Select Pages - Manual Posting{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📱 Manual Posting to Selected Pages</h2>
+    
+    {% if pages %}
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; font-weight: 600;">
+        <span id="page-counter">📊 0 of {{ pages|length }} pages selected</span>
+    </div>
+    
+    <form method="post" action="/post" style="margin-top: 20px;">
+        <input type="hidden" name="user_token" value="{{ user_token }}">
+        
+        <div class="form-group">
+            <label>📄 Select Pages to Post To (Click to toggle)</label>
+            <div style="margin-bottom: 15px;">
+                <button type="button" id="select-all-btn" class="btn btn-primary" style="margin-right: 10px; width: auto;">✓ Select All</button>
+                <button type="button" id="deselect-all-btn" class="btn btn-primary" style="width: auto;">✗ Deselect All</button>
+            </div>
+            <div class="checkbox-group">
+                {% for pid, info in pages.items() %}
+                <div class="checkbox-item">
+                    <input type="checkbox" name="pages" value="{{ pid }}" id="page_{{ pid }}" class="page-checkbox">
+                    <label for="page_{{ pid }}">{{ info.name }} (ID: {{ pid }})</label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="message">💬 Message Content</label>
+            <textarea name="message" id="message" placeholder="Enter your message here..." required></textarea>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <div class="form-group">
+                <label for="repeats">🔁 Number of Repeats</label>
+                <input type="number" name="repeats" id="repeats" value="1" min="1" max="100">
+                <small style="color: #666;">How many times to repeat posting cycle</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="interval">⏱️ Interval (seconds)</label>
+                <input type="number" name="interval" id="interval" value="60" min="1" max="3600">
+                <small style="color: #666;">Delay between repeat rounds</small>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1em;" id="submit-btn" disabled>
+            📤 Start Posting (Select pages first)
+        </button>
+    </form>
+    
+    <a href="/" class="btn btn-primary" style="margin-top: 15px;">← Back to Dashboard</a>
+    {% else %}
+    <p>❌ No pages found. Please provide a valid Facebook user access token with pages management permission.</p>
+    <a href="/" class="btn btn-primary">← Back to Dashboard</a>
+    {% endif %}
+</div>
+
+<script>
+    // Page selection counter and controls
+    const pageCheckboxes = document.querySelectorAll('.page-checkbox');
+    const pageCounter = document.getElementById('page-counter');
+    const submitBtn = document.getElementById('submit-btn');
+    const selectAllBtn = document.getElementById('select-all-btn');
+    const deselectAllBtn = document.getElementById('deselect-all-btn');
+    const totalPages = {{ pages|length }};
+    
+    function updateCounter() {
+        const selected = document.querySelectorAll('.page-checkbox:checked').length;
+        pageCounter.textContent = `📊 ${selected} of ${totalPages} pages selected`;
+        submitBtn.disabled = selected === 0;
+        if (selected === 0) {
+            submitBtn.textContent = '📤 Start Posting (Select pages first)';
+        } else {
+            submitBtn.textContent = `📤 Start Posting (${selected} page${selected > 1 ? 's' : ''})`;
+        }
+    }
+    
+    pageCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateCounter);
+    });
+    
+    selectAllBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        pageCheckboxes.forEach(checkbox => checkbox.checked = true);
+        updateCounter();
+    });
+    
+    deselectAllBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        pageCheckboxes.forEach(checkbox => checkbox.checked = false);
+        updateCounter();
+    });
+    
+    // Initial counter update
+    updateCounter();
+</script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Nexora Control Panel{% endblock %}
+
+{% block content %}
+<div class="stats">
+    <div class="stat-box">
+        <h3>2</h3>
+        <p>Active Modules</p>
+    </div>
+    <div class="stat-box">
+        <h3>{{ posted.keys()|length }}</h3>
+        <p>Running Tasks</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>📊 Quick Start</h2>
+    <p>Welcome to Nexora Control Panel. Choose an option to get started:</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+        <div style="border: 2px solid #667eea; padding: 20px; border-radius: 12px; text-align: center;">
+            <h3>🏢 Nexora Suite</h3>
+            <p>Professional Immigration & Visa Services</p>
+            <a href="/nexora/suite" class="btn btn-primary" style="margin-top: 10px;">Manage</a>
+        </div>
+        
+        <div style="border: 2px solid #764ba2; padding: 20px; border-radius: 12px; text-align: center;">
+            <h3>💼 Nexora Investments</h3>
+            <p>Travel & Investment Opportunities</p>
+            <a href="/nexora/investments" class="btn btn-primary" style="margin-top: 10px;">Manage</a>
+        </div>
+        
+        <div style="border: 2px solid #667eea; padding: 20px; border-radius: 12px; text-align: center;">
+            <h3>📱 Manual Posting</h3>
+            <p>Post to Selected Pages</p>
+            <form method="post" action="/pages">
+                <input type="hidden" name="user_token" value="{{ user_token }}">
+                <input type="submit" value="Select Pages" class="btn btn-success" style="width: 100%; margin-top: 10px;">
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if posted %}
+<div class="card">
+    <h2>📈 Recent Activity</h2>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
+                <th style="text-align: left; padding: 12px; font-weight: 600;">Task</th>
+                <th style="text-align: left; padding: 12px; font-weight: 600;">Status</th>
+                <th style="text-align: left; padding: 12px; font-weight: 600;">Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task, info in posted.items() %}
+            <tr style="border-bottom: 1px solid #e0e0e0;">
+                <td style="padding: 12px;">{{ task }}</td>
+                <td style="padding: 12px;">
+                    <span class="status status-{{ info.status }}">{{ info.status | upper }}</span>
+                </td>
+                <td style="padding: 12px;">{{ info.get('started_at', info.get('completed_at', 'N/A')) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

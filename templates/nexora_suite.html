@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Nexora Suite - Immigration & Visa Services{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🏢 Nexora Suite - Immigration & Visa Services</h2>
+    <p>Automated posting system for professional immigration and visa assistance services.</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;">
+        <div style="text-align: center; padding: 20px; background: white; border-radius: 8px; border: 2px solid #e0e0e0;">
+            <span class="status status-{{ status.status }}">{{ status.status | upper }}</span>
+            <p style="margin-top: 10px; color: #666;">Current Status</p>
+        </div>
+    </div>
+    
+    <form method="post" style="margin: 20px 0;">
+        {% if status.status == 'idle' or status.status == 'stopped' %}
+            <button type="submit" name="action" value="start" class="btn btn-success" style="width: 100%; font-size: 1.1em; padding: 15px;">
+                ▶️ Start Posting
+            </button>
+        {% else %}
+            <button type="submit" name="action" value="stop" class="btn btn-danger" style="width: 100%; font-size: 1.1em; padding: 15px;">
+                ⏸️ Stop Posting
+            </button>
+        {% endif %}
+    </form>
+</div>
+
+<div class="card">
+    <h2>📋 Module Details</h2>
+    <div style="display: grid; gap: 15px;">
+        <div>
+            <h3 style="color: #667eea;">Posts File</h3>
+            <p><code style="background: #f0f0f0; padding: 5px 10px; border-radius: 3px;">posts/visa_posts.json</code></p>
+        </div>
+        <div>
+            <h3 style="color: #667eea;">Image Folder</h3>
+            <p><code style="background: #f0f0f0; padding: 5px 10px; border-radius: 3px;">images/</code></p>
+        </div>
+        <div>
+            <h3 style="color: #667eea;">Default Post Interval</h3>
+            <p>30 minutes between posts</p>
+        </div>
+    </div>
+</div>
+
+{% if status.started_at %}
+<div class="card">
+    <h2>⏱️ Timing</h2>
+    <p>Started: <strong>{{ status.started_at }}</strong></p>
+    {% if status.stopped_at %}
+        <p>Stopped: <strong>{{ status.stopped_at }}</strong></p>
+    {% endif %}
+</div>
+{% endif %}
+
+<a href="/" class="btn btn-primary">← Back to Dashboard</a>
+{% endblock %}

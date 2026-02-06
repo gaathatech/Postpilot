@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Posting - Preview{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📋 Confirm Posting - Review Selection</h2>
+    <p>Please review your posting configuration before starting:</p>
+</div>
+
+<div class="card">
+    <h3 style="color: #667eea; margin-bottom: 15px;">📱 Selected Pages ({{ selected_pages|length }} total)</h3>
+    <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; border-left: 5px solid #667eea;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #667eea;">
+                    <th style="text-align: left; padding: 10px; font-weight: 600;">Page Name</th>
+                    <th style="text-align: left; padding: 10px; font-weight: 600;">Page ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pid, name in selected_pages.items() %}
+                <tr style="border-bottom: 1px solid #e0e0e0;">
+                    <td style="padding: 10px;">{{ name }}</td>
+                    <td style="padding: 10px; font-family: monospace; font-size: 0.9em;">{{ pid }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="color: #667eea; margin-bottom: 15px;">💬 Message Content</h3>
+    <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; word-wrap: break-word; white-space: pre-wrap;">{{ message }}</div>
+</div>
+
+<div class="card">
+    <h3 style="color: #667eea; margin-bottom: 15px;">⚙️ Posting Settings</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
+            <p style="color: #666; font-size: 0.9em;">Number of Repeats</p>
+            <h3 style="color: #667eea;">{{ repeats }}</h3>
+        </div>
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
+            <p style="color: #666; font-size: 0.9em;">Interval (seconds)</p>
+            <h3 style="color: #667eea;">{{ interval }}s</h3>
+        </div>
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
+            <p style="color: #666; font-size: 0.9em;">Total Posts</p>
+            <h3 style="color: #667eea;">{{ (selected_pages|length) * repeats }}</h3>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+    <a href="/" class="btn btn-primary" style="text-align: center; padding: 15px;">
+        ❌ Cancel
+    </a>
+    <form method="post" action="/post/execute" style="display: grid;">
+        <input type="hidden" name="user_token" value="{{ user_token }}">
+        <input type="hidden" name="message" value="{{ message }}">
+        <input type="hidden" name="repeats" value="{{ repeats }}">
+        <input type="hidden" name="interval" value="{{ interval }}">
+        {% for pid in selected_pages.keys() %}
+        <input type="hidden" name="pages" value="{{ pid }}">
+        {% endfor %}
+        <button type="submit" class="btn btn-success" style="padding: 15px; font-size: 1.1em;">
+            ✅ Confirm & Start Posting
+        </button>
+    </form>
+</div>
+{% endblock %}

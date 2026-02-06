@@ -1,23 +1,46 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Post Results</title>
-  </head>
-  <body>
-    <h1>Post Results</h1>
-    <ul>
-    {% for r in results %}
-      <li>
-        Page: {{ r.page_id }} — Status: {{ r.status }}
-        {% if r.response %}
-          — ID: {{ r.response.get('id') }}
-        {% elif r.response_text %}
-          — Error: {{ r.response_text }}
-        {% endif %}
-      </li>
-    {% endfor %}
-    </ul>
-    <p><a href="/">Back</a></p>
-  </body>
-  </html>
+{% extends "base.html" %}
+
+{% block title %}Posting Results{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📊 Posting Results</h2>
+    
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
+                <th style="text-align: left; padding: 12px; font-weight: 600;">Page ID</th>
+                <th style="text-align: left; padding: 12px; font-weight: 600;">Page Name</th>
+                <th style="text-align: left; padding: 12px; font-weight: 600;">Status</th>
+                <th style="text-align: left; padding: 12px; font-weight: 600;">Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in results %}
+            <tr style="border-bottom: 1px solid #e0e0e0;">
+                <td style="padding: 12px; font-family: monospace; font-size: 0.9em;">{{ r.page_id }}</td>
+                <td style="padding: 12px;">{{ r.get('page_name', 'N/A') }}</td>
+                <td style="padding: 12px;">
+                    {% if r.status == 'success' %}
+                        <span class="status status-completed">✅ SUCCESS</span>
+                    {% elif r.status == 'error' %}
+                        <span class="status status-error" style="background: #f8d7da; color: #721c24;">❌ ERROR</span>
+                    {% else %}
+                        <span class="status status-idle">⚠️ {{ r.status | upper }}</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 12px;">
+                    {% if r.get('response') %}
+                        Posted ID: <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">{{ r.response.get('id', 'N/A') }}</code>
+                    {% elif r.get('error') %}
+                        {{ r.error }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <a href="/" class="btn btn-primary" style="margin-top: 20px;">← Back to Dashboard</a>
+</div>
+{% endblock %}
